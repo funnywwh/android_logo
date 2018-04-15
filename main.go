@@ -5,11 +5,14 @@ import (
 	"image"
 	"image/color"
 	"math"
+	//	"math"
 	//	"image/draw"
 	"image/png"
 	"os"
 
 	"golang.org/x/image/draw"
+
+	"github.com/llgcode/draw2d/draw2dimg"
 )
 
 func main() {
@@ -38,22 +41,17 @@ func main() {
 func circleMask(dst image.Image) image.Image {
 	sr := dst.Bounds()
 
-	circle := image.NewAlpha(sr)
-	centerPt := image.Point{sr.Dx() / 2, sr.Dy() / 2}
-	var r = float64(sr.Dx()) / 2
-	for y := sr.Min.Y; y < sr.Max.Y; y++ {
-		for x := sr.Min.X; x < sr.Max.X; x++ {
-			dx, dy := x-centerPt.X, y-centerPt.Y
-			d := math.Sqrt(float64(dx*dx) + float64(dy*dy))
-			if d < r {
-				circle.SetAlpha(x, y, color.Alpha{0xff})
-			}
-			//			dd := math.Abs(d - r)
-			//			if dd < 1 {
-			//				circle.SetAlpha(x, y, color.Alpha{A: (0xff - uint8(32*dd))})
-			//			}
-		}
-	}
+	circle := image.NewRGBA(sr)
+	gc := draw2dimg.NewGraphicContext(circle)
+	gc.SetFillColor(color.Alpha{A: 0xff})
+	gc.SetStrokeColor(color.Alpha{A: 0xff})
+	gc.SetLineWidth(1)
+	r := float64(sr.Dx() / 2)
+	gc.BeginPath()
+
+	gc.ArcTo(r, r, r, r, 0, -math.Pi*2)
+	gc.Close()
+	gc.Fill()
 	return circle
 }
 
